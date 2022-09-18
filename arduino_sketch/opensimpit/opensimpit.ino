@@ -323,9 +323,9 @@ void set_joystick_axis(uint8_t axis_num, uint16_t value) {
     #endif
   }
   else {
-    Serial.print("{\"axis\":{");
+    Serial.print("{\"axis\":{\"");
     Serial.print(axis_num);
-    Serial.print(":");
+    Serial.print("\":");
     Serial.print(value);
     Serial.println("}}");
   }
@@ -339,9 +339,9 @@ void set_joystick_button(uint8_t btn_index, bool state) {
     #endif
   }
   else {
-    Serial.print("{\"btn\":{");
+    Serial.print("{\"btn\":{\"");
     Serial.print(btn_index);
-    Serial.print(":");
+    Serial.print("\":");
     Serial.print(state? 1 : 0);
     Serial.println("}}");
   }
@@ -502,8 +502,9 @@ void config_dump() {
   Serial.print(config_object.used_axes);
   Serial.print(",\"axes\":{");
   for (uint8_t i=0; i<config_object.used_axes; i++) {
+    Serial.print('"');
     Serial.print(i);
-    Serial.print(":[");
+    Serial.print("\":[");
     Serial.print(config_object.axes[i].status); Serial.print(",");
     Serial.print(config_object.axes[i].board_pin); Serial.print(",");
     Serial.print(config_object.axes[i].joystick_axis); Serial.print(",");
@@ -520,8 +521,9 @@ void config_dump() {
   Serial.print(config_object.used_buttons);
   Serial.print(",\"buttons\":{");
   for (uint8_t i=0; i<config_object.used_buttons; i++) {
+    Serial.print('"');
     Serial.print(i);
-    Serial.print(":[");
+    Serial.print("\":[");
     Serial.print(config_object.buttons[i].status); Serial.print(",");
     Serial.print(config_object.buttons[i].expander_index); Serial.print(",");
     Serial.print(config_object.buttons[i].expander_pin); Serial.print(",");
@@ -530,6 +532,19 @@ void config_dump() {
     
     if (i < (config_object.used_buttons-1)) Serial.print(",");
   }
+
+  Serial.print("},\"lcd16x2\":{");
+  for (uint8_t i=0; i<8; i++) {
+    Serial.print('"');
+    Serial.print(i);
+    Serial.print("\":[");
+    Serial.print(config_object.lcds16x2[i].status & 0x01); Serial.print(",");
+    Serial.print(config_object.lcds16x2[i].lcd_index);
+    Serial.print("]");
+
+    if (i < 7) Serial.print(",");
+  }
+  
 
   Serial.println("}}");
 }
@@ -628,7 +643,7 @@ bool config_load() {
   
   // All is sorted
   must_read_io = 1;
-  Serial.println("{\"msg\":\"Config loaded\"");
+  Serial.println("{\"msg\":\"Config loaded\"}");
   return 1;
 }
 
@@ -1090,6 +1105,13 @@ void serial_print_message(char * message) {
   Serial.println("\"}");
 }
 
+void serial_print_error(char * received) {
+  Serial.print("{\"msg\":\"ERROR\",\"received\":\"");
+  Serial.print(received);
+  Serial.println("\"}");
+}
+
+
 void serial_print_ok() {
   serial_print_message("OK");
 }
@@ -1097,6 +1119,7 @@ void serial_print_ok() {
 void serial_print_error() {
   serial_print_message("ERROR");
 }
+
 
 /**
  * Process the contents in the serial buffer, performing the corresponding actions synchronously
@@ -1173,7 +1196,9 @@ void serial_process_buffer() {
     else                          serial_print_error();    
   }
 
-  else serial_print_error();    
+  // Unknown command. We fail silently to allow garbage to be flushed
+  // by sending a '\n' at any time.
+  //else serial_print_error(serial_buffer);    
 }
 
 // ============================================================================
