@@ -8,9 +8,9 @@ OpenSimPit is a set of resources for building simpits (simulation gaming cockpit
 
 The strategy in OpenSimPit is to have a flexible, modular package of firmware/software, where the main board is entirely configurable via PC software to match your cockpit design (the board firmware code is not even aware of what your cockpit has). The focus is on cheap and widely available components to connect or solder yourself, so your shopping list will have things like a $2 I2C expansion board, not a $200 Airbus replica panel or the alike. 
 
-The code can be deployed in your Arduino board without any coding at all (unless you want to add new features, of course - it's open source after all). This way, you can focus on the rest of the work - building and shopping for the nice gear - and set everything up with a clean "cockpit setup" interface.
+The code can be deployed in your Arduino board without any coding at all (unless you want to add new features, of course - it's open source after all). This way, you can focus on the rest of the work - building and shopping for the nice gear - and set everything up with a clean "cockpit setup" software interface.
 
-The cockpit connects with the host computer recognised as a USB Joystick (if using the Bluepill board) or via USB Serial port (all board). The Serial port can be used directly in games compatible with OpenSimPit (''.dll''/''.so'' files will be provided for this, in this repository), or using a driver software on PC reading from the COM port and emulating a joystick (using e.g. vJoy).
+The cockpit connects with the host computer recognised as a USB Joystick (if using the Bluepill board) or via USB Serial port (all boards). The Serial port can be used directly in games compatible with OpenSimPit (``.dll``/``.so`` files will be provided for this, in this repository), or using a driver software on PC reading from the COM port and emulating a joystick (using e.g. vJoy).
 
 ----
 
@@ -24,4 +24,11 @@ This repository contains:
   
   - PC Serial Driver Software -> this allows you to connect your simpit via Serial port into any games by translating into a virtual joystick. You don't need this if you use a Bluepill board in USB Joystick mode, as it works directly like a USB joystick. Currently made in python and also open source - an executable binary (faster) C version is planned. (WIP, coming soon)
   
-  - SDK for game developers (as ''.dll''/''.so'') for making games _directly_ compatible to OpenSimPit via Serial port (and therefore not requiring a Bluepill board). Game developers don't really _need_ the SDK, it is just a convenience: any programming language capable of reading a serial port can read the OpenSimPit packets directly as they are simple JSON strings (the SDK includes a sample python script to do this). (WIP, coming soon)
+  - SDK for game developers (as ``.dll``/``.so``) for making games _directly_ compatible to OpenSimPit via Serial port (and therefore not requiring a Bluepill board). This includes:
+    - General purpose library (the ``.dll``) to be used anywhere a ``dll`` can be used
+    - Python module to be dropped into any python project (relies on pySerial)
+    - Godot Engine addon plugin with GDScript `OpenSimPit` autoload ready to be dropped in projects (the software configurator uses this plugin)
+    - Equivalent of the above but for Unity3D (help is welcome on that)
+    - Equivalent of the above but for UE (help is welcome on that)
+    
+    Game developers don't really _need_ the SDK, it is just a convenience: any programming language capable of reading a serial port can read the OpenSimPit packets directly as they are simple JSON strings (the SDK includes a sample python script to do this). (WIP, coming soon)
