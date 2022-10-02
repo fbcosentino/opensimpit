@@ -1,0 +1,106 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=4
+
+_global_script_classes=[ {
+"base": "Node",
+"class": "GDSerComm",
+"language": "GDScript",
+"path": "res://addons/opensimpit/GDSerComm/GDSerComm.gd"
+}, {
+"base": "Resource",
+"class": "OSPAxisConfig",
+"language": "GDScript",
+"path": "res://addons/opensimpit/resources/opensimpit_config_axis.gd"
+}, {
+"base": "Resource",
+"class": "OSPBoardConfig",
+"language": "GDScript",
+"path": "res://addons/opensimpit/resources/opensimpit_config_board.gd"
+}, {
+"base": "Resource",
+"class": "OSPButtonConfig",
+"language": "GDScript",
+"path": "res://addons/opensimpit/resources/opensimpit_config_button.gd"
+}, {
+"base": "Resource",
+"class": "OSPLcd16x2Config",
+"language": "GDScript",
+"path": "res://addons/opensimpit/resources/opensimpit_config_lcd16x2.gd"
+}, {
+"base": "Control",
+"class": "UIAxisConfig",
+"language": "GDScript",
+"path": "res://ui/components/UIAxisConfig/UIAxisConfig.gd"
+}, {
+"base": "Control",
+"class": "UIButtonConfig",
+"language": "GDScript",
+"path": "res://ui/components/UIButtonConfig/UIButtonConfig.gd"
+}, {
+"base": "Control",
+"class": "UILcd16x2Config",
+"language": "GDScript",
+"path": "res://ui/components/UILcd16x2Config/UILcd16x2Config.gd"
+} ]
+_global_script_class_icons={
+"GDSerComm": "",
+"OSPAxisConfig": "",
+"OSPBoardConfig": "",
+"OSPButtonConfig": "",
+"OSPLcd16x2Config": "",
+"UIAxisConfig": "",
+"UIButtonConfig": "",
+"UILcd16x2Config": ""
+}
+
+[application]
+
+config/name="OpenSimPit - Configuration Software"
+config/description="Configuration software for the OpenSimPit project - github.com/fbcosentino/opensimpit"
+run/main_scene="res://scenes/Main/Main.tscn"
+boot_splash/image="res://images/loading.png"
+boot_splash/bg_color=Color( 0.12549, 0, 0.25098, 1 )
+config/icon="res://icon.png"
+config/windows_native_icon="res://exe_icon.ico"
+
+[autoload]
+
+OpenSimPit="*res://addons/opensimpit/opensimpit_autoload.gd"
+
+[editor_plugins]
+
+enabled=PoolStringArray( "res://addons/opensimpit/plugin.cfg" )
+
+[gdnative]
+
+singletons=[  ]
+
+[gui]
+
+common/drop_mouse_on_gui_input_disabled=true
+
+[input]
+
+test={
+"deadzone": 0.5,
+"events": [ Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":0,"alt":false,"shift":false,"control":false,"meta":false,"command":false,"pressed":false,"scancode":65,"physical_scancode":0,"unicode":0,"echo":false,"script":null)
+ ]
+}
+
+[physics]
+
+common/enable_pause_aware_picking=true
+
+[rendering]
+
+quality/driver/driver_name="GLES2"
+vram_compression/import_etc=true
+vram_compression/import_etc2=false
+environment/default_environment="res://default_env.tres"

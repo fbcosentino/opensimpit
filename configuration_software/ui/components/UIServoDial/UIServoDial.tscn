@@ -1,0 +1,101 @@
+[gd_scene load_steps=5 format=2]
+
+[ext_resource path="res://ui/components/UIServoDial/UIServoDial.gd" type="Script" id=1]
+[ext_resource path="res://fonts/FreeSansBold.ttf" type="DynamicFontData" id=2]
+
+[sub_resource type="StyleBoxFlat" id=8]
+content_margin_left = 8.0
+content_margin_right = 8.0
+bg_color = Color( 0.126933, 0.096, 0.16, 1 )
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color( 0.494118, 0.619608, 0.74902, 1 )
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+
+[sub_resource type="DynamicFont" id=9]
+size = 10
+use_filter = true
+font_data = ExtResource( 2 )
+
+[node name="UIServoDial" type="Panel"]
+margin_right = 72.0
+margin_bottom = 64.0
+rect_min_size = Vector2( 72, 64 )
+custom_styles/panel = SubResource( 8 )
+script = ExtResource( 1 )
+
+[node name="Dial" type="Control" parent="."]
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+margin_top = -16.0
+margin_bottom = -16.0
+mouse_filter = 2
+
+[node name="Pivot" type="ColorRect" parent="Dial"]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_top = -7.0
+margin_right = 10.0
+margin_bottom = 3.0
+rect_rotation = 45.0
+mouse_filter = 2
+
+[node name="Hand" type="ColorRect" parent="Dial"]
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+margin_left = -2.0
+margin_top = -32.0
+margin_right = 2.0
+margin_bottom = 10.0
+mouse_filter = 2
+
+[node name="Limit1" type="ColorRect" parent="."]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -25.0
+margin_top = -8.0
+margin_right = -22.0
+margin_bottom = -5.0
+mouse_filter = 2
+color = Color( 0.494118, 0.619608, 0.74902, 1 )
+
+[node name="Limit2" type="ColorRect" parent="."]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = 22.0
+margin_top = -8.0
+margin_right = 25.0
+margin_bottom = -5.0
+mouse_filter = 2
+color = Color( 0.494118, 0.619608, 0.74902, 1 )
+
+[node name="LabelPercent" type="Label" parent="."]
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = -43.0
+margin_top = -14.0
+margin_right = -2.0
+margin_bottom = -1.0
+custom_colors/font_color = Color( 0.501961, 0.627451, 0.74902, 1 )
+custom_fonts/font = SubResource( 9 )
+text = "50%"
+align = 2
+
+[connection signal="gui_input" from="." to="." method="_on_UIServoDial_gui_input"]

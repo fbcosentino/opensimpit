@@ -1,0 +1,286 @@
+[gd_scene load_steps=21 format=2]
+
+[ext_resource path="res://images/icons/lcd_addresses/addr7.png" type="Texture" id=1]
+[ext_resource path="res://images/icons/lcd_addresses/addr2.png" type="Texture" id=2]
+[ext_resource path="res://images/icons/lcd_addresses/addr6.png" type="Texture" id=3]
+[ext_resource path="res://images/icons/lcd_addresses/addr3.png" type="Texture" id=4]
+[ext_resource path="res://images/icons/lcd_addresses/addr5.png" type="Texture" id=5]
+[ext_resource path="res://images/icons/lcd_addresses/addr1.png" type="Texture" id=6]
+[ext_resource path="res://images/icons/lcd_addresses/addr4.png" type="Texture" id=7]
+[ext_resource path="res://images/icons/lcd_addresses/addr0.png" type="Texture" id=8]
+[ext_resource path="res://ui/components/UITestLcd16x2/UITestLcd16x2.gd" type="Script" id=9]
+[ext_resource path="res://fonts/FreeSansBold.ttf" type="DynamicFontData" id=10]
+[ext_resource path="res://ui/components/UILcd16x2PositionSelect/UILcd16x2PositionSelect.tscn" type="PackedScene" id=11]
+[ext_resource path="res://fonts/ninepin.regular.ttf" type="DynamicFontData" id=12]
+
+[sub_resource type="StyleBoxFlat" id=18]
+bg_color = Color( 0.18, 0.16, 0.2, 1 )
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color( 0.501961, 0.627451, 0.74902, 1 )
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="DynamicFont" id=19]
+size = 10
+use_filter = true
+font_data = ExtResource( 10 )
+
+[sub_resource type="StyleBoxFlat" id=20]
+bg_color = Color( 0.126933, 0.096, 0.16, 1 )
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color( 0.495, 0.61825, 0.75, 1 )
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+
+[sub_resource type="StyleBoxFlat" id=21]
+bg_color = Color( 0.33, 0.415, 0.5, 1 )
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color( 0.494118, 0.619608, 0.74902, 0 )
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+
+[sub_resource type="StyleBoxFlat" id=22]
+bg_color = Color( 0.495, 0.6225, 0.75, 1 )
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color( 0.494118, 0.619608, 0.74902, 0 )
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+
+[sub_resource type="StyleBoxEmpty" id=6]
+
+[sub_resource type="DynamicFont" id=7]
+extra_spacing_char = 3
+font_data = ExtResource( 12 )
+
+[sub_resource type="StyleBoxFlat" id=8]
+content_margin_left = 8.0
+content_margin_right = 8.0
+bg_color = Color( 0.126933, 0.096, 0.16, 1 )
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color( 0.494118, 0.619608, 0.74902, 1 )
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+
+[node name="UITestLcd16x2" type="Panel"]
+margin_right = 256.0
+margin_bottom = 94.0
+rect_min_size = Vector2( 256, 94 )
+custom_styles/panel = SubResource( 18 )
+script = ExtResource( 9 )
+
+[node name="LabelLcdID" type="Label" parent="."]
+margin_left = 10.0
+margin_top = 8.0
+margin_right = 107.0
+margin_bottom = 21.0
+custom_colors/font_color = Color( 0.501961, 0.627451, 0.74902, 1 )
+custom_fonts/font = SubResource( 19 )
+text = "LCD 0        Address:"
+
+[node name="LcdAddress" type="Control" parent="."]
+margin_left = 114.0
+margin_top = 7.0
+margin_right = 146.0
+margin_bottom = 23.0
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Addr0" type="TextureRect" parent="LcdAddress"]
+margin_right = 32.0
+margin_bottom = 16.0
+texture = ExtResource( 8 )
+
+[node name="Addr1" type="TextureRect" parent="LcdAddress"]
+visible = false
+margin_right = 32.0
+margin_bottom = 16.0
+texture = ExtResource( 6 )
+
+[node name="Addr2" type="TextureRect" parent="LcdAddress"]
+visible = false
+margin_right = 32.0
+margin_bottom = 16.0
+texture = ExtResource( 2 )
+
+[node name="Addr3" type="TextureRect" parent="LcdAddress"]
+visible = false
+margin_right = 32.0
+margin_bottom = 16.0
+texture = ExtResource( 4 )
+
+[node name="Addr4" type="TextureRect" parent="LcdAddress"]
+visible = false
+margin_right = 32.0
+margin_bottom = 16.0
+texture = ExtResource( 7 )
+
+[node name="Addr5" type="TextureRect" parent="LcdAddress"]
+visible = false
+margin_right = 32.0
+margin_bottom = 16.0
+texture = ExtResource( 5 )
+
+[node name="Addr6" type="TextureRect" parent="LcdAddress"]
+visible = false
+margin_right = 32.0
+margin_bottom = 16.0
+texture = ExtResource( 3 )
+
+[node name="Addr7" type="TextureRect" parent="LcdAddress"]
+visible = false
+margin_right = 32.0
+margin_bottom = 16.0
+texture = ExtResource( 1 )
+
+[node name="PanelBL" type="Panel" parent="."]
+anchor_left = 1.0
+anchor_right = 1.0
+margin_left = -27.0
+margin_top = 4.0
+margin_right = -5.0
+margin_bottom = 26.0
+custom_styles/panel = SubResource( 20 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="BtnBL" type="Button" parent="PanelBL"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+focus_mode = 0
+custom_styles/hover = SubResource( 21 )
+custom_styles/pressed = SubResource( 22 )
+custom_styles/normal = SubResource( 6 )
+toggle_mode = true
+enabled_focus_mode = 0
+
+[node name="LabelLcdID" type="Label" parent="PanelBL"]
+margin_left = -56.0
+margin_right = -1.0
+margin_bottom = 22.0
+custom_colors/font_color = Color( 0.501961, 0.627451, 0.74902, 1 )
+custom_fonts/font = SubResource( 19 )
+text = "Backlight:"
+align = 1
+valign = 1
+
+[node name="LabelText" type="Label" parent="."]
+margin_left = 10.0
+margin_top = 40.0
+margin_right = 60.0
+margin_bottom = 53.0
+custom_colors/font_color = Color( 0.501961, 0.627451, 0.74902, 1 )
+custom_fonts/font = SubResource( 19 )
+text = "Send text:"
+
+[node name="PanelPosition" type="Panel" parent="."]
+margin_left = 75.0
+margin_top = 38.0
+margin_right = 117.0
+margin_bottom = 55.0
+custom_styles/panel = SubResource( 20 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="BtnPosition" type="Button" parent="PanelPosition"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+focus_mode = 0
+custom_styles/hover = SubResource( 21 )
+custom_styles/pressed = SubResource( 22 )
+custom_styles/normal = SubResource( 6 )
+enabled_focus_mode = 0
+
+[node name="Label" type="Label" parent="PanelPosition"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+custom_colors/font_color = Color( 0.501961, 0.627451, 0.74902, 1 )
+custom_fonts/font = SubResource( 19 )
+text = "0, 0"
+align = 1
+valign = 1
+
+[node name="PanelClear" type="Panel" parent="."]
+anchor_left = 1.0
+anchor_right = 1.0
+margin_left = -77.0
+margin_top = 38.0
+margin_right = -8.0
+margin_bottom = 55.0
+custom_styles/panel = SubResource( 20 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="BtnClear" type="Button" parent="PanelClear"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+focus_mode = 0
+custom_styles/hover = SubResource( 21 )
+custom_styles/pressed = SubResource( 22 )
+custom_styles/normal = SubResource( 6 )
+enabled_focus_mode = 0
+
+[node name="Label" type="Label" parent="PanelClear"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+custom_colors/font_color = Color( 0.501961, 0.627451, 0.74902, 1 )
+custom_fonts/font = SubResource( 19 )
+text = "Clear"
+align = 1
+valign = 1
+
+[node name="TextTestEdit" type="LineEdit" parent="."]
+anchor_right = 1.0
+margin_left = 8.0
+margin_top = 63.0
+margin_right = -8.0
+margin_bottom = 87.0
+custom_fonts/font = SubResource( 7 )
+custom_styles/normal = SubResource( 8 )
+placeholder_text = "Type text here"
+placeholder_alpha = 0.3
+
+[node name="UILCD16X2PositionSelect" parent="." instance=ExtResource( 11 )]
+visible = false
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -115.0
+margin_top = -25.0
+margin_right = 115.0
+margin_bottom = 25.0
+
+[connection signal="toggled" from="PanelBL/BtnBL" to="." method="_on_BtnBL_toggled"]
+[connection signal="pressed" from="PanelPosition/BtnPosition" to="." method="_on_BtnPosition_pressed"]
+[connection signal="pressed" from="PanelClear/BtnClear" to="." method="_on_BtnClear_pressed"]
+[connection signal="text_entered" from="TextTestEdit" to="." method="_on_TextTestEdit_text_entered"]
+[connection signal="position_selected" from="UILCD16X2PositionSelect" to="." method="_on_UILCD16X2PositionSelect_position_selected"]

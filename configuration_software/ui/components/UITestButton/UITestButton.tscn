@@ -1,0 +1,88 @@
+[gd_scene load_steps=7 format=2]
+
+[ext_resource path="res://ui/components/UITestButton/UITestButton.gd" type="Script" id=1]
+[ext_resource path="res://fonts/FreeSansBold.ttf" type="DynamicFontData" id=2]
+
+[sub_resource type="StyleBoxFlat" id=1]
+bg_color = Color( 0.18, 0.16, 0.2, 1 )
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color( 0.501961, 0.627451, 0.74902, 1 )
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id=3]
+bg_color = Color( 0.126933, 0.096, 0.16, 1 )
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color( 0.495, 0.61825, 0.75, 1 )
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+
+[sub_resource type="StyleBoxFlat" id=4]
+bg_color = Color( 0.494118, 0.619608, 0.74902, 1 )
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color( 0.494118, 0.619608, 0.74902, 0 )
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+
+[sub_resource type="DynamicFont" id=5]
+size = 10
+use_filter = true
+font_data = ExtResource( 2 )
+
+[node name="UITestButton" type="Panel"]
+margin_right = 32.0
+margin_bottom = 32.0
+rect_min_size = Vector2( 32, 48 )
+custom_styles/panel = SubResource( 1 )
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Panel" type="Panel" parent="."]
+anchor_right = 1.0
+margin_left = 4.0
+margin_top = 4.0
+margin_right = -4.0
+margin_bottom = 28.0
+custom_styles/panel = SubResource( 3 )
+
+[node name="PanelActive" type="Panel" parent="Panel"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+custom_styles/panel = SubResource( 4 )
+
+[node name="LabelBtn" type="Label" parent="Panel"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+custom_colors/font_color = Color( 1, 1, 1, 1 )
+custom_fonts/font = SubResource( 5 )
+text = "0"
+align = 1
+valign = 1
+
+[node name="LabelPin" type="Label" parent="."]
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_top = -17.0
+margin_bottom = -4.0
+custom_colors/font_color = Color( 0.501961, 0.627451, 0.74902, 1 )
+custom_fonts/font = SubResource( 5 )
+text = "0/0"
+align = 1

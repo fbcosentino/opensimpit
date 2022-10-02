@@ -1,0 +1,14 @@
+[general]
+
+singleton=false
+load_once=true
+symbol_prefix="godot_"
+reloadable=true
+
+[entry]
+
+Windows.64="res://addons/opensimpit/GDSerComm/GDSercomm_3_5.dll"
+
+[dependencies]
+
+Windows.64=[ "res://addons/opensimpit/GDSerComm/sercomm.dll" ]

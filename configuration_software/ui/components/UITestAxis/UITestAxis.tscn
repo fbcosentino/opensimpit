@@ -1,0 +1,85 @@
+[gd_scene load_steps=7 format=2]
+
+[ext_resource path="res://fonts/FreeSansBold.ttf" type="DynamicFontData" id=1]
+[ext_resource path="res://ui/components/UITestAxis/UITestAxis.gd" type="Script" id=2]
+
+[sub_resource type="StyleBoxFlat" id=18]
+bg_color = Color( 0.18, 0.16, 0.2, 1 )
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color( 0.501961, 0.627451, 0.74902, 1 )
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="DynamicFont" id=2]
+size = 10
+use_filter = true
+font_data = ExtResource( 1 )
+
+[sub_resource type="StyleBoxFlat" id=4]
+bg_color = Color( 0.33, 0.412167, 0.5, 1 )
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color( 0.8, 0.8, 0.8, 0 )
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+
+[sub_resource type="StyleBoxFlat" id=3]
+bg_color = Color( 0.126933, 0.096, 0.16, 1 )
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color( 0.495, 0.61825, 0.75, 1 )
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+
+[node name="UITestAxis" type="Panel"]
+margin_right = 48.0
+margin_bottom = 128.0
+rect_min_size = Vector2( 48, 128 )
+custom_styles/panel = SubResource( 18 )
+script = ExtResource( 2 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Label" type="Label" parent="."]
+margin_left = 4.0
+margin_top = 126.0
+margin_right = 128.0
+margin_bottom = 139.0
+rect_rotation = -90.0
+custom_colors/font_color = Color( 0.501961, 0.627451, 0.74902, 1 )
+custom_fonts/font = SubResource( 2 )
+text = "Pin: A0        Axis: 0"
+align = 1
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Bar" type="ProgressBar" parent="."]
+margin_left = 20.0
+margin_top = 125.0
+margin_right = 142.0
+margin_bottom = 145.0
+rect_rotation = -90.0
+custom_styles/fg = SubResource( 4 )
+custom_styles/bg = SubResource( 3 )
+max_value = 1023.0
+step = 1.0
+rounded = true
+percent_visible = false
+__meta__ = {
+"_edit_lock_": true
+}

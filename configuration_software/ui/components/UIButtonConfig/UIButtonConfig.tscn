@@ -1,0 +1,168 @@
+[gd_scene load_steps=18 format=2]
+
+[ext_resource path="res://fonts/FreeSans.ttf" type="DynamicFontData" id=1]
+[ext_resource path="res://fonts/FreeSansBold.ttf" type="DynamicFontData" id=2]
+[ext_resource path="res://ui/components/UIButtonConfig/UIButtonConfig.gd" type="Script" id=3]
+[ext_resource path="res://ui/panel_style.tres" type="StyleBox" id=4]
+[ext_resource path="res://images/icons/exp_addresses/addr7.png" type="Texture" id=5]
+[ext_resource path="res://images/icons/exp_addresses/addr3.png" type="Texture" id=6]
+[ext_resource path="res://images/icons/exp_addresses/addr4.png" type="Texture" id=7]
+[ext_resource path="res://images/icons/exp_addresses/addr5.png" type="Texture" id=8]
+[ext_resource path="res://images/icons/exp_addresses/addr6.png" type="Texture" id=9]
+[ext_resource path="res://images/icons/exp_addresses/addr0.png" type="Texture" id=10]
+[ext_resource path="res://images/icons/exp_addresses/addr1.png" type="Texture" id=11]
+[ext_resource path="res://images/icons/exp_addresses/addr2.png" type="Texture" id=12]
+
+[sub_resource type="DynamicFont" id=1]
+size = 10
+use_filter = true
+font_data = ExtResource( 2 )
+
+[sub_resource type="DynamicFont" id=2]
+size = 10
+use_filter = true
+extra_spacing_top = -4
+extra_spacing_bottom = -4
+font_data = ExtResource( 1 )
+
+[sub_resource type="DynamicFont" id=6]
+size = 12
+use_filter = true
+extra_spacing_top = -4
+extra_spacing_bottom = -4
+font_data = ExtResource( 1 )
+
+[sub_resource type="DynamicFont" id=7]
+size = 10
+use_filter = true
+extra_spacing_top = -4
+extra_spacing_bottom = -4
+font_data = ExtResource( 1 )
+
+[sub_resource type="DynamicFont" id=5]
+size = 10
+use_filter = true
+extra_spacing_top = -4
+extra_spacing_bottom = -4
+font_data = ExtResource( 1 )
+
+[node name="UIButtonConfig" type="Panel"]
+margin_right = 558.0
+margin_bottom = 64.0
+rect_min_size = Vector2( 0, 64 )
+custom_styles/panel = ExtResource( 4 )
+script = ExtResource( 3 )
+
+[node name="LabelTitle" type="Label" parent="."]
+margin_left = 6.5
+margin_top = 5.0
+margin_right = 28.5
+margin_bottom = 18.0
+custom_colors/font_color = Color( 0.501961, 0.627451, 0.74902, 1 )
+custom_fonts/font = SubResource( 1 )
+text = "BUTTON"
+
+[node name="LabelExpander" type="Label" parent="."]
+margin_left = 70.5
+margin_top = 13.0
+margin_right = 116.5
+margin_bottom = 26.0
+custom_colors/font_color = Color( 1, 1, 1, 1 )
+custom_fonts/font = SubResource( 2 )
+text = "Expander"
+
+[node name="BtnExpander" type="OptionButton" parent="."]
+margin_left = 70.0
+margin_top = 26.0
+margin_right = 144.0
+margin_bottom = 56.0
+custom_fonts/font = SubResource( 6 )
+text = "0"
+icon = ExtResource( 10 )
+align = 1
+items = [ "0", ExtResource( 10 ), false, 0, null, "1", ExtResource( 11 ), false, 1, null, "2", ExtResource( 12 ), false, 2, null, "3", ExtResource( 6 ), false, 3, null, "4", ExtResource( 7 ), false, 4, null, "5", ExtResource( 8 ), false, 5, null, "6", ExtResource( 9 ), false, 6, null, "7", ExtResource( 5 ), false, 7, null ]
+selected = 0
+
+[node name="LabelPin" type="Label" parent="."]
+margin_left = 158.5
+margin_top = 13.0
+margin_right = 204.5
+margin_bottom = 26.0
+custom_colors/font_color = Color( 1, 1, 1, 1 )
+custom_fonts/font = SubResource( 2 )
+text = "Pin"
+
+[node name="BtnPin" type="SpinBox" parent="."]
+margin_left = 158.0
+margin_top = 29.0
+margin_right = 232.0
+margin_bottom = 53.0
+max_value = 15.0
+rounded = true
+
+[node name="LabelButtonNum" type="Label" parent="."]
+margin_left = 246.5
+margin_top = 13.0
+margin_right = 292.5
+margin_bottom = 26.0
+custom_colors/font_color = Color( 1, 1, 1, 1 )
+custom_fonts/font = SubResource( 2 )
+text = "Button"
+
+[node name="BtnButtonNum" type="SpinBox" parent="."]
+margin_left = 246.0
+margin_top = 29.0
+margin_right = 320.0
+margin_bottom = 53.0
+max_value = 31.0
+rounded = true
+
+[node name="LabelInvert" type="Label" parent="."]
+margin_left = 334.5
+margin_top = 13.0
+margin_right = 392.5
+margin_bottom = 26.0
+custom_colors/font_color = Color( 1, 1, 1, 1 )
+custom_fonts/font = SubResource( 7 )
+text = "Polarity"
+
+[node name="BtnInvert" type="OptionButton" parent="."]
+margin_left = 334.0
+margin_top = 31.0
+margin_right = 428.0
+margin_bottom = 52.0
+custom_fonts/font = SubResource( 6 )
+text = "1 = Pressed"
+items = [ "1 = Pressed", null, false, 0, null, "0 = Pressed", null, false, 1, null ]
+selected = 0
+
+[node name="LabelToggle" type="Label" parent="."]
+margin_left = 446.5
+margin_top = 13.0
+margin_right = 504.5
+margin_bottom = 26.0
+custom_colors/font_color = Color( 1, 1, 1, 1 )
+custom_fonts/font = SubResource( 7 )
+text = "Mode"
+
+[node name="BtnToggle" type="OptionButton" parent="."]
+margin_left = 446.0
+margin_top = 31.0
+margin_right = 540.0
+margin_bottom = 52.0
+custom_fonts/font = SubResource( 6 )
+text = "Press"
+items = [ "Press", null, false, 0, null, "Toggle", null, false, 1, null ]
+selected = 0
+
+[node name="BtnDelete" type="Button" parent="."]
+margin_left = 6.0
+margin_top = 38.0
+margin_right = 48.0
+margin_bottom = 58.0
+focus_mode = 0
+custom_fonts/font = SubResource( 5 )
+enabled_focus_mode = 0
+text = "Delete"
+
+[connection signal="pressed" from="BtnDelete" to="." method="_on_BtnDelete_pressed"]
