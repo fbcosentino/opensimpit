@@ -83,29 +83,30 @@
 #define NUMBER_MAX_LCD16X2          8 // Can't be more than 8 due to I2C addressing
                                       // Independent on Bluepill, but clashes with expanders on other boards
 
+#define EEPROM_ADDRESS_OFFSET        256 // In case you don't want to use the very firs bytes
 
 // ============================================================================
 // CONFIG VARS
 
 #if defined(_BOARD_GENERIC_STM32F103C_H_)
-#define BLUEPILL
-#define EXPANDER_IRQ_PIN PA7
-uint8_t AXIS_PINS[NUMBER_OF_BUILTIN_AXES] = {PA0, PA1, PA2, PA3, PA4, PA5};
+  #define BLUEPILL
+  #define EXPANDER_IRQ_PIN PA7
+  uint8_t AXIS_PINS[NUMBER_OF_BUILTIN_AXES] = {PA0, PA1, PA2, PA3, PA4, PA5};
 
 #elif defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
-#define ARDUINO_MEGA
-#define EXPANDER_IRQ_PIN 2
-uint8_t AXIS_PINS[NUMBER_OF_BUILTIN_AXES] = {A0, A1, A2, A3, A4, A5};
+  #define ARDUINO_MEGA
+  #define EXPANDER_IRQ_PIN 4
+  uint8_t AXIS_PINS[NUMBER_OF_BUILTIN_AXES] = {A0, A1, A2, A3, A4, A5};
 
 #elif defined(__AVR_ATmega328P__) || defined(__AVR_ATmega168__)
-#define ARDUINO_UNO
-#define EXPANDER_IRQ_PIN 2
-uint8_t AXIS_PINS[NUMBER_OF_BUILTIN_AXES] = {A0, A1, A2, A3, A4, A5};
+  #define ARDUINO_UNO
+  #define EXPANDER_IRQ_PIN 4
+  uint8_t AXIS_PINS[NUMBER_OF_BUILTIN_AXES] = {A0, A1, A2, A3, A4, A5};
 
 #elif defined(__AVR_ATmega32U4__) || defined(__AVR_ATmega16U4__)
-#define ARDUINO_LEONARDO
-#define EXPANDER_IRQ_PIN 2
-uint8_t AXIS_PINS[NUMBER_OF_BUILTIN_AXES] = {A0, A1, A2, A3, A4, A5};
+  #define ARDUINO_LEONARDO
+  #define EXPANDER_IRQ_PIN 4
+  uint8_t AXIS_PINS[NUMBER_OF_BUILTIN_AXES] = {A0, A1, A2, A3, A4, A5};
 
 #endif 
 
@@ -123,8 +124,6 @@ typedef struct AxisConfig_t {
 
 uint8_t used_axes = 0;
 
-//AxisConfig_t axes[NUMBER_OF_BUILTIN_AXES];
-
 
 typedef struct ButtonConfig_t {
   uint8_t expander_index;
@@ -134,13 +133,15 @@ typedef struct ButtonConfig_t {
 } ButtonConfig_t; 
 // size: 4 bytes per button (2 * uint16_t) -> THIS SIZE MUST BE EVEN (uint16 aligned)
 
-//ButtonConfig_t buttons[NUMBER_OF_JOYSTICK_BUTTONS];
 
 typedef struct Lcd16x2Config_t {
   uint8_t lcd_index;
   uint8_t status; // [ xxxxxx | INITIALIZED | ENABLED ]
 } Lcd16x2Config_t;
 // size: 2 bytes -> THIS SIZE MUST BE EVEN (uint16 aligned)
+
+
+
 
 typedef struct EEPROM_storage_object_t {
   ButtonConfig_t buttons[NUMBER_OF_JOYSTICK_BUTTONS];
@@ -165,6 +166,15 @@ typedef struct serial_param_t {
   uint8_t status;
 } serial_param_t;
 
+// Unlike LCDs (which are 1:1 to I2C addresses), 16 servos share a same I2C address, which
+// means there will be a very limited range of addresses allocated to servos, possibly
+// just one. Therefore, servos do not occupy EEPROM in the config, and their I2C addresses
+// are expected to be sequential and directly related to their ID in the simpit (that is,
+// servo board 0 is address 0x80, servo board 1 is address 0x81, etc). Servo numbers are
+// expected to be continuously assigned to boards (e.g. servo 15 is servo 15 in board 0, 
+// while servo 16 is servo 0 in board 1).
+// PCA9685 ICs are initialized the first time they are used, on the fly.
+uint8_t is_servo_expanders_initialized = 0; // Bitpacked, one bit per expander
 
 bool is_joystick_connected = 0;
 bool must_read_io = 0;
@@ -174,21 +184,24 @@ bool must_read_io = 0;
 
 // USB
 #if defined(BLUEPILL) || defined(ARDUINO_LEONARDO)
-#include <USBComposite.h>
-USBHID HID;
-HIDJoystick Joystick(HID);
+  #include <USBComposite.h>
+  USBHID HID;
+  HIDJoystick Joystick(HID);
 #endif
 
 // Port expanders
 #include <Wire.h>
 
-// LCDs
+// I2C Outputs (LCDs and Servos)
 #include "LiquidCrystal_I2C.h"
 #if defined(BLUEPILL)
-TwoWire WireLCDs(2, I2C_FAST_MODE);
+  TwoWire WireLCDs(2, I2C_FAST_MODE);
+  #define WireServos WireLCDs
 #else
-#define WireLCDs Wire
+  #define WireLCDs Wire
+  #define WireServos Wire
 #endif
+
 
 // Class declaration is static and hardcoded, but they are only 
 // initialized (lcd_x.begin(&Wire2)) when used
@@ -205,7 +218,7 @@ LiquidCrystal_I2C lcd16x2_7(0x20, 16, 2);
 // Storage
 #include <EEPROM.h>
 EEPROM_storage_object_t config_object;
-#define EEPROM_STORAGE_SIZE  (EEPROM_VARIABLES_SIZE + 10*NUMBER_OF_BUILTIN_AXES + 4*NUMBER_OF_JOYSTICK_BUTTONS) / 2
+#define EEPROM_STORAGE_SIZE  (EEPROM_VARIABLES_SIZE + 10*NUMBER_OF_BUILTIN_AXES + 4*NUMBER_OF_JOYSTICK_BUTTONS + 2*NUMBER_MAX_LCD16X2) / 2
 
 
 
@@ -224,7 +237,7 @@ void setup() {
   while (!USBComposite) {
     delay(10);
     i++;
-    if (i > 100) {
+    if (i > 95) {
       break;
     }
   }
@@ -258,9 +271,11 @@ void setup() {
 
   // Initialize LCDs
   #if defined(BLUEPILL)
-  WireLCDs.begin();
+    WireLCDs.begin();
   #endif
   delay(50); // LCDs need at least 40ms after power up to be able to interact
+
+  // Servos share I2C with other devices and therefore WireServos needs not be initialized
   
   set_battery_display(0, 0, 0, 0);
 
@@ -417,6 +432,71 @@ void lcd16x2_write_message(uint8_t lcd_index, uint8_t row, uint8_t col, char * m
 }
 
 
+// Servos are controlled by PCA9685 expander boards, such as https://www.aliexpress.com/item/32466332558.html
+// IC Datasheet: https://cdn-shop.adafruit.com/datasheets/PCA9685.pdf
+
+void servos_initialize_board(uint8_t servo_expander_index) {
+  uint8_t board_address = 0x40 | servo_expander_index; // Arduino uses 7-bit address
+  
+  // Board needs to be on sleep state to set frequency
+  WireServos.beginTransmission(board_address);
+  WireServos.write(0x00); // Register: MODE1
+  WireServos.write(0b00110000); // internal clock, auto-increment, sleep, all other addresses disabled
+  WireServos.endTransmission();  
+
+  // Set the prescaler for a frequency of 50Hz (20ms update rate for servos)
+  WireServos.beginTransmission(board_address);
+  WireServos.write(0xFE); // Register: PRE_SCALE
+  WireServos.write(121); // (25MHz / (4096 * frequency)) - 1 = 121 for a frequency of 50Hz (20ms period)
+  WireServos.endTransmission();  
+
+  // Bring the board to operational state
+  WireServos.beginTransmission(board_address);
+  WireServos.write(0x00); // Register: MODE1
+  WireServos.write(0b00100000); // internal clock, auto-increment, osc on, all other addresses disabled
+  WireServos.endTransmission();
+
+  delay(1); // PCA9685 needs 500us for clock startup
+  
+  is_servo_expanders_initialized |= (1 << servo_expander_index); // Flag state as initialized
+}
+
+
+void servos_set_position(uint8_t servo_num, uint8_t servo_value_percent) {
+  // Lower nibble in servo_num is board output index, higher nibble is board index
+  uint8_t servo_expander_index = (servo_num >> 4) & 0x0F;
+
+  uint8_t servo_index = (servo_num) & 0x0F;
+  
+  bool is_this_board_initialized = is_servo_expanders_initialized & (1 << servo_expander_index);
+
+  if (!is_this_board_initialized) {
+    // This board still needs to be initialized
+    servos_initialize_board(servo_expander_index);
+  }
+
+  // [i2c address] [register base address] [ON_L] [ON_H] [OFF_L] [OFF_H]
+  uint8_t register_base = 0x06 + servo_index*4; // First of the 4 bytes for this servo, as per datasheet
+
+  // With the 50Hz prescaler, 1ms corresponds to 205 units (20ms = 4096)
+  // Servos usually operate in the range 1ms - 2ms (where 1.5ms is center)
+  // Cheap ones from aliexpress accept 0.5ms - 2.5ms, but it is wise to avoid the end of scale
+  // as trying to move a servo past its limit might cause overcurrent
+  uint16_t time_active = 205 + ((uint32_t)205*(uint32_t)servo_value_percent)/100;
+  // Each servo is delayed 200us respective to the previous, to avoid 
+  // current spikes from all turning on at the same time
+  uint16_t time_delay_on = 41*servo_num; 
+  // Turns off time_active after turning on
+  uint16_t time_off = time_delay_on + time_active;
+  // Write settings to board
+  WireServos.beginTransmission(0x40 | servo_expander_index);
+  WireServos.write(register_base); 
+  WireServos.write((time_delay_on     ) & 0xFF); // LEDn_ON_L
+  WireServos.write((time_delay_on >> 8) & 0xFF); // LEDn_ON_H
+  WireServos.write((time_off          ) & 0xFF); // LEDn_OFF_L
+  WireServos.write((time_off      >> 8) & 0xFF); // LEDn_OFF_H
+  WireServos.endTransmission();
+}
 
 
 
@@ -494,7 +574,7 @@ void config_clear() {
 }
 
 void config_dump() {
-  Serial.print("{\"ver\":\"0.1\",\"board\":\"");
+  Serial.print("{\"ver\":\"0.2\",\"board\":\"");
   print_board();
   Serial.print("\",\"usb_connected\":");
   Serial.print(is_joystick_connected);
@@ -505,7 +585,7 @@ void config_dump() {
     Serial.print('"');
     Serial.print(i);
     Serial.print("\":[");
-    Serial.print(config_object.axes[i].status); Serial.print(",");
+    //Serial.print(config_object.axes[i].status); Serial.print(",");
     Serial.print(config_object.axes[i].board_pin); Serial.print(",");
     Serial.print(config_object.axes[i].joystick_axis); Serial.print(",");
     Serial.print(config_object.axes[i].min_value); Serial.print(",");
@@ -524,10 +604,11 @@ void config_dump() {
     Serial.print('"');
     Serial.print(i);
     Serial.print("\":[");
-    Serial.print(config_object.buttons[i].status); Serial.print(",");
     Serial.print(config_object.buttons[i].expander_index); Serial.print(",");
     Serial.print(config_object.buttons[i].expander_pin); Serial.print(",");
-    Serial.print(config_object.buttons[i].joystick_button);
+    Serial.print(config_object.buttons[i].joystick_button); Serial.print(",");
+    Serial.print( (config_object.buttons[i].status & 0x02)? '1' : '0'); Serial.print(",");
+    Serial.print( (config_object.buttons[i].status & 0x04)? '1' : '0');
     Serial.print("]");
     
     if (i < (config_object.used_buttons-1)) Serial.print(",");
@@ -565,7 +646,7 @@ bool config_load() {
   // Address 1 onwards contains data
 
   // Read address 0 and compare to expected
-  status = EEPROM.read(0, &eeprom_buf_len);
+  status = EEPROM.read(EEPROM_ADDRESS_OFFSET, &eeprom_buf_len);
   if (status != EEPROM_OK) {
     if (status == EEPROM_BAD_ADDRESS) {
       Serial.println("{\"msg\":\"Config was never saved\"}");
@@ -585,7 +666,7 @@ bool config_load() {
 
   // Read binary data
   for (uint16_t i=0; i<EEPROM_STORAGE_SIZE; i++) {
-    if (EEPROM.read(1 + i, &data16) != EEPROM_OK) {
+    if (EEPROM.read(EEPROM_ADDRESS_OFFSET + 1 + i, &data16) != EEPROM_OK) {
       had_read_error = 1;
       break;
     }
@@ -609,7 +690,7 @@ bool config_load() {
   // Addresses 0 and 1 have the uint16 size of config object
   // Address 2 onward has binary data
   
-  eeprom_buf_len = ((uint16_t)EEPROM.read(0) << 8) | EEPROM.read(1);
+  eeprom_buf_len = ((uint16_t)EEPROM.read(EEPROM_ADDRESS_OFFSET) << 8) | EEPROM.read(EEPROM_ADDRESS_OFFSET + 1);
 
   if (eeprom_buf_len != eeprom_storage_size_bytes) {
     Serial.println("{\"msg\":\"Config was never saved\"");
@@ -618,7 +699,7 @@ bool config_load() {
 
   // Read binary data
   for (uint16_t i=0; i<eeprom_storage_size_bytes; i++) {
-    eeprom_buf[i] = EEPROM.read(2 + i);
+    eeprom_buf[i] = EEPROM.read(EEPROM_ADDRESS_OFFSET + 2 + i);
   }
   
   #endif
@@ -655,7 +736,7 @@ void config_dump_eeprom() {
   uint16_t data16;
   
   for (uint16_t i=0; i<EEPROM_STORAGE_SIZE+1; i++) {
-    status = EEPROM.read(i, &data16);
+    status = EEPROM.read(EEPROM_ADDRESS_OFFSET + i, &data16);
     if (status != EEPROM_OK) {
       Serial.print(" - error: ");
       Serial.println(status);
@@ -672,7 +753,7 @@ void config_dump_eeprom() {
   uint16_t eeprom_storage_size_bytes = EEPROM_STORAGE_SIZE*2;
   
   for (uint16_t i=0; i<eeprom_storage_size_bytes+2; i++) {
-      Serial.println(EEPROM.read(i), HEX);
+      Serial.println(EEPROM.read(EEPROM_ADDRESS_OFFSET + i), HEX);
   }
 
   #endif
@@ -692,7 +773,7 @@ bool config_save() {
   // Address 0 contains length (in uint16) of stored object
   // Address 1 onwards contains data
 
-  status = EEPROM.write(0, EEPROM_STORAGE_SIZE);
+  status = EEPROM.write(EEPROM_ADDRESS_OFFSET, EEPROM_STORAGE_SIZE);
   if (status != EEPROM_OK) {
     Serial.print("{\"msg\":\"Error saving config: ");
     Serial.print(status);
@@ -702,7 +783,7 @@ bool config_save() {
 
   // Write binary data
   for (uint16_t i=0; i<EEPROM_STORAGE_SIZE; i++) {
-    if (EEPROM.write(1 + i, eeprom_buf[i]) != EEPROM_OK) {
+    if (EEPROM.write(EEPROM_ADDRESS_OFFSET + 1 + i, eeprom_buf[i]) != EEPROM_OK) {
       Serial.println("{\"msg\":\"Error saving config\"");
       return 0;
     }
@@ -719,16 +800,16 @@ bool config_save() {
   uint8_t * eeprom_buf = (uint8_t *)&config_object;
   uint16_t eeprom_storage_size_bytes = EEPROM_STORAGE_SIZE*2;
 
-  EEPROM.write(0, (eeprom_storage_size_bytes >> 8) & 0xFF);
-  EEPROM.write(1, eeprom_storage_size_bytes & 0xFF);
+  EEPROM.write(EEPROM_ADDRESS_OFFSET, (eeprom_storage_size_bytes >> 8) & 0xFF);
+  EEPROM.write(EEPROM_ADDRESS_OFFSET + 1, eeprom_storage_size_bytes & 0xFF);
   
   // Write binary data
   for (uint16_t i=0; i<eeprom_storage_size_bytes; i++) {
-    EEPROM.write(2 + i, eeprom_buf[i]);
+    EEPROM.write(EEPROM_ADDRESS_OFFSET + 2 + i, eeprom_buf[i]);
   }
 
   // All is sorted
-  Serial.println("{\"msg\":\"Config saved\"");
+  Serial.println("{\"msg\":\"Config saved\"}");
   return 1;
   
   #endif
@@ -898,13 +979,13 @@ bool serial_add_axis(uint16_t start_index) {
 
   else {
     vmin = 0;
-    vmax = 4095;
+    vmax = 1023;
   }
 
-  if ((pin >= NUMBER_OF_BUILTIN_AXES) || (axis >= NUMBER_OF_BUILTIN_AXES) || (vmin > 4095) || (vmax > 4095)) 
+  if ((pin >= NUMBER_OF_BUILTIN_AXES) || (axis >= NUMBER_OF_BUILTIN_AXES) || (vmin > 1023) || (vmax > 1023)) 
     return 0; // Invalid values
 
-  add_axis(AXIS_PINS[pin], axis, vmin, vmax);
+  add_axis(pin, axis, vmin, vmax);
   
   return 1;
 }
@@ -1048,6 +1129,26 @@ bool serial_lcd16x2_write_message(uint16_t start_index) {
 }
 
 
+bool serial_servo_set_value(uint16_t start_index) {
+  uint8_t servo_num;
+  uint8_t value;
+  
+  serial_param_t param = serial_extract_param(start_index);
+  if ((param.status != SERIAL_PARAM_INT) || (!param.next_param_index)) return 0; // Invalid value or last value
+  if ( (param.int_value < 0) || (param.int_value >= 256) ) return 0; // Must fit a uint8_t, apart from this any value is valid
+  servo_num = param.int_value;
+
+  param = serial_extract_param(param.next_param_index);
+  if ((param.status != SERIAL_PARAM_INT) || (param.next_param_index)) return 0; // Invalid value or not last value
+  if ( (param.int_value < 0) || (param.int_value > 100) ) return 0; // Must be a round percentage
+  value = param.int_value;
+
+  servos_set_position(servo_num, value);
+  
+  return 1;
+}
+
+
 // This refers to the module <https://www.aliexpress.com/item/2025558433.html> connected to a driver arduino pro mini
 // Firmware for this driver pro mini should also be included in the project repository
 bool serial_set_bat_driver(uint16_t start_index) {
@@ -1126,6 +1227,9 @@ void serial_print_error() {
  */
 void serial_process_buffer() {
   uint16_t buflen = serial_buffer_cursor;
+
+  // ==================================================
+  // CONFIGURATION MESSAGES
   
   if (is_equal_to(serial_buffer, "AT")) {
     serial_print_message("AT OK");
@@ -1176,29 +1280,41 @@ void serial_process_buffer() {
     else                       serial_print_error();    
   }
 
-  else if (starts_with(serial_buffer, "LCD16X2CLR=")) {
+
+ 
+  // ==================================================
+  // PROPERTY WRITING MESSAGES
+  
+  // Property writing messages are as short as possible to save bandwidth, as they 
+  // are heavily used in-game. They all start with !
+
+  else if (starts_with(serial_buffer, "!LCB=")) {
+    if (serial_lcd16x2_set_backlight(5)) serial_print_ok();
+    else                                  serial_print_error();    
+  }
+
+  else if (starts_with(serial_buffer, "!LCC=")) {
     if (serial_lcd16x2_clear(11)) serial_print_ok();
     else                          serial_print_error();    
   }
 
-  else if (starts_with(serial_buffer, "LCD16X2BL=")) {
-    if (serial_lcd16x2_set_backlight(10)) serial_print_ok();
+  else if (starts_with(serial_buffer, "!LC=")) {
+    if (serial_lcd16x2_write_message(4)) serial_print_ok();
     else                                  serial_print_error();    
   }
 
-  else if (starts_with(serial_buffer, "LCD16X2MSG=")) {
-    if (serial_lcd16x2_write_message(11)) serial_print_ok();
-    else                                  serial_print_error();    
+  else if (starts_with(serial_buffer, "!S=")) {
+    if (serial_servo_set_value(3)) serial_print_ok();
+    else                           serial_print_error();    
   }
 
-  else if (starts_with(serial_buffer, "BAT=")) {
+  else if (starts_with(serial_buffer, "!BT=")) {
     if (serial_set_bat_driver(4)) serial_print_ok();
     else                          serial_print_error();    
   }
 
   // Unknown command. We fail silently to allow garbage to be flushed
   // by sending a '\n' at any time.
-  //else serial_print_error(serial_buffer);    
 }
 
 // ============================================================================
@@ -1221,7 +1337,7 @@ void loop() {
     AxisConfig_t* axis_data = (config_object.axes + axis_i); // points to axes[axis_i]
     if (axis_data->status == 0) continue; // unused axis
     
-    uint16_t axis_raw = analogRead(axis_data->board_pin);
+    uint16_t axis_raw = analogRead(AXIS_PINS[axis_data->board_pin]);
     uint16_t axis_value = (axis_raw > axis_data->min_value) ? map(axis_raw, axis_data->min_value, axis_data->max_value, JOYAXIS_MIN, JOYAXIS_MAX) : 0;
 
     set_joystick_axis(axis_data->joystick_axis, axis_value);
