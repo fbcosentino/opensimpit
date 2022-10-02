@@ -897,7 +897,7 @@ void serial_add_to_buffer(char c) {
  * otherwise the param string length
  */
 serial_param_t serial_extract_param(uint16_t start_index) {
-  char param_buf[12];
+  char param_buf[22];
   uint8_t param_cur = 0;
   uint8_t i = start_index;
   bool found_comma = 0;
@@ -1294,7 +1294,7 @@ void serial_process_buffer() {
   }
 
   else if (starts_with(serial_buffer, "!LCC=")) {
-    if (serial_lcd16x2_clear(11)) serial_print_ok();
+    if (serial_lcd16x2_clear(5)) serial_print_ok();
     else                          serial_print_error();    
   }
 
