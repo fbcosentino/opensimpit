@@ -1,6 +1,6 @@
-<img align="left" src="doc/img_top_bar.png">
+<img align="left" src="doc/img_top_bar.png" width="100%">
 
-_Open source one-size-fits-all DIY simulation cockpit based on Arduino and cheap modules from aliexpress_
+_Open source one-size-fits-all simulation cockpit based on Arduino_
 
 ----
 
