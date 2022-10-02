@@ -21,6 +21,8 @@ The focus is on cheap and widely available components to connect or solder yours
 
 The code can be deployed in your Arduino board without any coding at all (unless you want to add new features, of course - it's open source after all). This way, you can focus on the rest of the work - building and shopping for the nice gear - and set everything up with a clean "cockpit setup" software interface.
 
+![](doc/img_config_software.png)
+
 The cockpit connects with the host computer recognised as a USB Joystick (if using the Bluepill board) or via USB Serial port (all boards). The Serial port can be used directly in games compatible with OpenSimPit (``.dll``/``.so`` files will be provided for this, in this repository), or using a driver software on PC reading from the COM port and emulating a joystick (using e.g. vJoy).
 
 ----
