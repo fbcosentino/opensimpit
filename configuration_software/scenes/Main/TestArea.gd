@@ -19,6 +19,13 @@ onready var servo_num_edit = $Panel/Scroll/VBox/Servos/UIServos/ServoNum
 onready var servo_dial = $Panel/Scroll/VBox/Servos/UIServos/UIServoDial
 onready var servo_board_label = $Panel/Scroll/VBox/Servos/UIServos/LabelBoardNum
 
+onready var radios = [
+	$Panel/Scroll/VBox/Radios/UIRadioCOM1,
+	$Panel/Scroll/VBox/Radios/UIRadioCOM2,
+	$Panel/Scroll/VBox/Radios/UIRadioNAV1,
+	$Panel/Scroll/VBox/Radios/UIRadioNAV2,
+]
+
 var test_axes = {}
 var test_buttons = {}
 var test_lcds16x2 = {}
@@ -93,6 +100,12 @@ func _on_axis_changed(axis_id, value):
 func _on_button_changed(button_number, value):
 	if button_number in test_buttons:
 		test_buttons[button_number].set_value(value)
+
+func _on_radio_changed(radio_number, active, standby):
+	if radio_number >= radios.size():
+		return
+	
+	radios[radio_number].set_frequencies(active, standby)
 
 
 func _on_Servo_BtnSet_pressed():

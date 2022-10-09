@@ -45,6 +45,7 @@ class OpenSimPit:
     buttons_callbacks = []
     press_callbacks = []
     release_callbacks = []
+    radio_callbacks = []
 
     def __init__(self, serial_port):
         osps.open_port(serial_port)
@@ -81,10 +82,13 @@ class OpenSimPit:
         data = osps.check_packet()
         while data != None:
             if "axis" in data:
-                self._process_axes(data["axes"])
+                self._process_axes(data["axis"])
             
             if "btn" in data:
                 self._process_buttons(data["btn"])
+
+            if "rad" in data:
+                self._process_radios(data["rad"])
             
             data = osps.check_packet()
     
@@ -114,6 +118,10 @@ class OpenSimPit:
         self.release_callbacks.append(func)
 
 
+    def add_function_for_radio_data(self, func):
+        self.radio_callbacks.append(func)
+
+
     def _process_axes(self, axes_data):
         # axes_data is a dictionary where keys are axis numbers and values are
         # integers in range 0-1023
@@ -138,4 +146,13 @@ class OpenSimPit:
             else:
                 for callback in self.release_callbacks:
                     callback(btn_num)
-        
+    
+    def _process_radios(self, radio_data):
+        # radio_data is a dictionary where keys are radio indices:
+        # 0: COM1  1: COM2  2: NAV1  3: NAV2
+        # and values are a list with 2 items: active and standby frequencies (float)
+        # E.g. {"0":[101.5,108.25],"1":[120.0,121.0],"2":[98.5, 110.5],"3":[130.0,131.5]}
+        for radio_num in radio_data:
+            freqs = radio_data[radio_num]
+            for callback in self.radio_callbacks:
+                callback(radio_num, freqs[0], freqs[1]) # Number, active, standby

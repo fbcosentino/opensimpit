@@ -16,6 +16,7 @@ signal dump_decoded
 signal config_write_result(successful)
 signal axis_changed(axis_number, value)
 signal button_changed(button_number, value)
+signal radio_changed(radio_number, active, standby)
 
 
 
@@ -269,7 +270,14 @@ func _process_opensimpit_dict(data: Dictionary):
 			for btn_number_str in btn_data:
 				var btn_number = int(btn_number_str)
 				emit_signal("button_changed", btn_number, btn_data[btn_number_str])
-
+		
+		if "rad" in data:
+			var rad_data = {}
+			for key_str in data["rad"]:
+				var freqs = data["rad"][key_str]
+				if freqs.size() == 2:
+					var radio_number = int(key_str)
+					emit_signal("radio_changed", radio_number, freqs[0], freqs[1])
 
 func _decode_dump(data) -> bool:
 	if (not "ver" in data) or (not "board" in data):
@@ -293,40 +301,56 @@ func _decode_dump(data) -> bool:
 	
 	# Axes
 	board_config.axes.clear()
-	for axis_index_str in data["axes"]:
-		if (not axis_index_str is String) or (not axis_index_str.is_valid_integer()):
-			emit_signal("error", "[color=#ffff88]Invalid axis index:[/color] [color=#ffff55]"+str(axis_index_str)+"[/color]")
-			continue
-		
-		var axis_index = int(axis_index_str)
-		var axis_array = data["axes"][axis_index_str]
-		
-		board_config.axes[axis_index] = OSPAxisConfig.new(axis_array)
+	if ("axes" in data):
+		for axis_index_str in data["axes"]:
+			if (not axis_index_str is String) or (not axis_index_str.is_valid_integer()):
+				emit_signal("error", "[color=#ffff88]Invalid axis index:[/color] [color=#ffff55]"+str(axis_index_str)+"[/color]")
+				continue
+			
+			var axis_index = int(axis_index_str)
+			var axis_array = data["axes"][axis_index_str]
+			
+			board_config.axes[axis_index] = OSPAxisConfig.new(axis_array)
 	
 	# Buttons
 	board_config.buttons.clear()
-	for btn_index_str in data["buttons"]:
-		if (not btn_index_str is String) or (not btn_index_str.is_valid_integer()):
-			emit_signal("error", "[color=#ffff88]Invalid button index:[/color] [color=#ffff55]"+str(btn_index_str)+"[/color]")
-			continue
-	
-		var btn_index = int(btn_index_str)
-		var btn_array = data["buttons"][btn_index_str]
+	if ("buttons" in data):
+		for btn_index_str in data["buttons"]:
+			if (not btn_index_str is String) or (not btn_index_str.is_valid_integer()):
+				emit_signal("error", "[color=#ffff88]Invalid button index:[/color] [color=#ffff55]"+str(btn_index_str)+"[/color]")
+				continue
 		
-		board_config.buttons[btn_index] = OSPButtonConfig.new(btn_array)
+			var btn_index = int(btn_index_str)
+			var btn_array = data["buttons"][btn_index_str]
+			
+			board_config.buttons[btn_index] = OSPButtonConfig.new(btn_array)
 	
 	# LCDs 16x2
 	board_config.lcds16x2.clear()
-	for lcd_index_str in data["lcd16x2"]:
-		if (not lcd_index_str is String) or (not lcd_index_str.is_valid_integer()):
-			emit_signal("error", "[color=#ffff88]Invalid LCD 16x2 index:[/color] [color=#ffff55]"+str(lcd_index_str)+"[/color]")
-			continue
-	
-		var lcd_number = int(lcd_index_str)
-		var lcd_array = data["lcd16x2"][lcd_index_str]
+	if ("lcd16x2" in data):
+		for lcd_index_str in data["lcd16x2"]:
+			if (not lcd_index_str is String) or (not lcd_index_str.is_valid_integer()):
+				emit_signal("error", "[color=#ffff88]Invalid LCD 16x2 index:[/color] [color=#ffff55]"+str(lcd_index_str)+"[/color]")
+				continue
 		
-		board_config.lcds16x2[lcd_number] = OSPLcd16x2Config.new(lcd_number, lcd_array)
+			var lcd_number = int(lcd_index_str)
+			var lcd_array = data["lcd16x2"][lcd_index_str]
+			
+			board_config.lcds16x2[lcd_number] = OSPLcd16x2Config.new(lcd_number, lcd_array)
 	
+	# Radios
+	if ("rad" in data):
+		for radio_index_str in data["rad"]:
+			if (not radio_index_str is String) or (not radio_index_str.is_valid_integer()):
+				emit_signal("error", "[color=#ffff88]Invalid Radio index:[/color] [color=#ffff55]"+str(radio_index_str)+"[/color]")
+				continue
+		
+			var radio_index = int(radio_index_str)
+			var freqs = data["rad"][radio_index_str]
+			emit_signal("radio_changed", radio_index, freqs[0], freqs[1])
+
+
+
 	print("Done")
 	return true
 

@@ -62,6 +62,7 @@ func _ready():
 	__= OpenSimPit.connect("error", self, "_on_OSP_error")
 	__= OpenSimPit.connect("axis_changed", test_area, "_on_axis_changed")
 	__= OpenSimPit.connect("button_changed", test_area, "_on_button_changed")
+	__= OpenSimPit.connect("radio_changed", test_area, "_on_radio_changed")
 	
 	$PageSerialPort.show()
 	$MainScreen.hide()
