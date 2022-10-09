@@ -43,13 +43,20 @@ The USB-to-Serial adapter connection is done as below:
 
 ![Taken from https://microcontrollerelectronics.com/wp-content/uploads/2018/03/stm32f103c8t6_serial.png](doc/bluepill_serial.png)
 
+To flash the firmware:
+- Move the top yellow jumper (BOOT0) to the right
+- Reset the board
+- `Upload` the sketch
+- Move the jumper to the left (or simply remove it)
+- Reset the board
+
 \*\*\* **_This is not needed for the other boards, which work out-of-the-box._** \*\*\*
 
 
 
 ### Wiring
 
-The OpenSimPit main board uses fixed pins groups for the function categories, as below:
+The OpenSimPit main board uses fixed pin groups for the function categories, as below:
 
 #### I2C Bus
 
@@ -68,7 +75,7 @@ The following input pins are used to read interrupts coming from modules:
 
 #### Analog Inputs
 
-All boards support a maximum of 6 analog inputs directly connected to the pins `A0` to `A5`, except Arduin Uno which supports 4 inputs `A0` to `A3` (as pins `A4` and `A5` are the I2C bus).
+All boards support a maximum of 6 analog inputs directly connected to the pins `A0` to `A5`, except Arduino Uno which supports 4 inputs `A0` to `A3` (as pins `A4` and `A5` are the I2C bus).
 
 
 #### Rotary Encoders

@@ -29,9 +29,14 @@ This module can be used with the following types of display:
    
 ![](doc/display7seg8dig.png)
 
+**OR**
+
+
  - 16x2 characters LCD display directly connected (via RS, EN, D4-D7). Uses a single display for both frequencies.
 
 ![](doc/img_lcd16x2a.png)
+
+**OR**
 
    
  - 16x2 characters LCD display (same as above) connected via I2C adapter board. Uses a single display for both frequencies.
@@ -90,7 +95,7 @@ TL;DR: If you are buying components to make a brand new cockpit, avoid this.
 
 ![](doc/radio_dig.png)
 
-This option uses two 8 digits 7-segment LED displays, driven by MAX7219 or similar, to closely simulate the look and feel of several traditional aircraft radio modules. The first two leftmost digits of each display are used to indicate function (with a small "ci" and "cii" for COM1 and COM2, and "ni" and "nii" for NAV1 and NAV2).
+This option uses two 8 digits 7-segment LED displays, driven by MAX7219 or similar, to closely simulate the look and feel of several traditional aircraft radio modules. The first two leftmost digits of each display are used to indicate function (with a small `ci` and `cii` for COM1 and COM2, and `ni` and `nii` for NAV1 and NAV2).
 
 Not all display boards on the market support "daisy chaining", so for best compatibility the wiring has `Vcc`, `GND`, `DIN` and `CLK` all in parallel, and dedicated `CS` lines per display.
 
@@ -102,9 +107,9 @@ Future versions will support using eight displays of six digits each, for the fu
 
 ### 16x2 Character Display
 
-<video src='doc/radio_lcd1.mp4'/>
+https://user-images.githubusercontent.com/28926813/194771263-11a184f4-4155-4f75-8549-3fb94f5cc530.mp4
 
 
 ### 8 Digit 7-Segment Displays
 
-<video src='doc/radio_led1.mp4'/>
+https://user-images.githubusercontent.com/28926813/194771275-6a9845ea-7193-4a62-8aaf-a906357266f5.mp4
