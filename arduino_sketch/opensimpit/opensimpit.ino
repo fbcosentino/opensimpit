@@ -91,21 +91,25 @@
 #if defined(_BOARD_GENERIC_STM32F103C_H_)
   #define BLUEPILL
   #define EXPANDER_IRQ_PIN PA7
+  #define RADIO_STACK_IRQ_PIN PB9
   uint8_t AXIS_PINS[NUMBER_OF_BUILTIN_AXES] = {PA0, PA1, PA2, PA3, PA4, PA5};
 
 #elif defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
   #define ARDUINO_MEGA
   #define EXPANDER_IRQ_PIN 4
+  #define RADIO_STACK_IRQ_PIN 9
   uint8_t AXIS_PINS[NUMBER_OF_BUILTIN_AXES] = {A0, A1, A2, A3, A4, A5};
 
 #elif defined(__AVR_ATmega328P__) || defined(__AVR_ATmega168__)
   #define ARDUINO_UNO
   #define EXPANDER_IRQ_PIN 4
+  #define RADIO_STACK_IRQ_PIN 9
   uint8_t AXIS_PINS[NUMBER_OF_BUILTIN_AXES] = {A0, A1, A2, A3, A4, A5};
 
 #elif defined(__AVR_ATmega32U4__) || defined(__AVR_ATmega16U4__)
   #define ARDUINO_LEONARDO
   #define EXPANDER_IRQ_PIN 4
+  #define RADIO_STACK_IRQ_PIN 9
   uint8_t AXIS_PINS[NUMBER_OF_BUILTIN_AXES] = {A0, A1, A2, A3, A4, A5};
 
 #endif 
@@ -178,6 +182,18 @@ uint8_t is_servo_expanders_initialized = 0; // Bitpacked, one bit per expander
 
 bool is_joystick_connected = 0;
 bool must_read_io = 0;
+
+
+// Radio stack is expected to be handled by a separate Arduino
+// In this version it's not one Arduino per radio, it's one Arduino handling the entire radio stack
+// In this version the stack is fixed: 2 COMMs (indices 0 and 1) and 2 NAVs (2 and 3)
+typedef struct radio_values_t {
+  float active;
+  float standby;
+  //float amount_fine;
+} radio_values_t;
+radio_values_t radio_values[4];
+#define RADIO_STACK_REPORT_SIZE 32
 
 // ============================================================================
 // INCLUDES / INITIALIZATION
@@ -263,12 +279,10 @@ void setup() {
   // Expanders
   Wire.begin();
   pinMode(EXPANDER_IRQ_PIN, INPUT_PULLUP); 
-    
-  // Temporary:
-  //add_axis(PA0, 0, 1150, 2750); // pin, axis, min, max
-  //add_button(0, 2, 0, 0, 1); // exp_i, exp_p, j_btn, inv, tog
-  
 
+  // Radio Stack
+  pinMode(RADIO_STACK_IRQ_PIN, INPUT_PULLUP);
+    
   // Initialize LCDs
   #if defined(BLUEPILL)
     WireLCDs.begin();
@@ -1200,6 +1214,21 @@ bool serial_set_num_expanders(uint16_t start_index) {
 }
 
 
+void serial_print_radio_report() {
+  Serial.print("{\"rad\":{");
+  for (int i=0; i<4; i++) {
+    if (i > 0) Serial.print(",");
+    Serial.print("\"");
+    Serial.print(i);
+    Serial.print("\":[");
+    Serial.print(radio_values[i].active);
+    Serial.print(",");
+    Serial.print(radio_values[i].standby);
+    Serial.print("]");
+  }
+  Serial.println("}}");
+}
+
 void serial_print_message(char * message) {
   Serial.print("{\"msg\":\"");
   Serial.print(message);
@@ -1326,11 +1355,6 @@ void loop() {
   
   serial_terminal_check();
 
-
-  
-  //int axis_0 = analogRead(PA0);
-  //Serial.println(axis_0);
-
   // AXES
   // TODO: instead of sending a JSON message for each axis, group them and send a single message with all axes
   for (uint8_t axis_i = 0; axis_i < config_object.used_axes; axis_i++) {
@@ -1404,6 +1428,25 @@ void loop() {
   }
 
 
+  // RADIO STACK
+  if (digitalRead(RADIO_STACK_IRQ_PIN) == 0) {
+    // We have radio event
+    
+    Wire.requestFrom(0x15, RADIO_STACK_REPORT_SIZE); 
+    uint8_t radio_buf[RADIO_STACK_REPORT_SIZE];
+
+    uint8_t count=0;
+    while (Wire.available()) {
+      radio_buf[count++] = Wire.read();
+    }
+    if (count == RADIO_STACK_REPORT_SIZE) {
+      char * radio_data_as_char = (char *)&radio_values;
+
+      for (int i=0; i<32; i++) radio_data_as_char[i] = radio_buf[i];
+
+      serial_print_radio_report();
+    }
+  }
 
 
 
